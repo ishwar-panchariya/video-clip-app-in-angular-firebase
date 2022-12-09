@@ -6,13 +6,15 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ManageComponent } from './manage/manage.component';
 import { UploadComponent } from './upload/upload.component';
 import { EditComponent } from './edit/edit.component';
+import { SafeURLPipe } from './pipe/safe-url.pipe';
 
 
 @NgModule({
   declarations: [
     ManageComponent,
     UploadComponent,
-    EditComponent
+    EditComponent,
+    SafeURLPipe
   ],
   imports: [
     CommonModule,
