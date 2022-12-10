@@ -12,35 +12,33 @@ import { ModalService } from 'src/app/services/modal.service';
 })
 export class ManageComponent implements OnInit {
 
-  videoOrder: string = '1';
+  videoOrder = '1'
   clips: IClip[] = []
-  activeClip: IClip | null = null;
+  activeClip: IClip | null = null
   sort$: BehaviorSubject<string>
 
   constructor(
-      private router: Router, 
-      private route: ActivatedRoute,
-      private clipService: ClipService,
-      private modal: ModalService
-    ) { 
-      this.sort$ = new BehaviorSubject(this.videoOrder)
-    }
+    private router: Router,
+    private route: ActivatedRoute,
+    private clipService: ClipService,
+    private modal: ModalService
+  ) { 
+    this.sort$ = new BehaviorSubject(this.videoOrder)
+  }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((params: Params) => {
-      this.videoOrder = params.sort === '2' ? params.sort : '1'
+      this.videoOrder = params.sort == '2' ? params.sort : '1'
       this.sort$.next(this.videoOrder)
     })
-
     this.clipService.getUserClips(this.sort$).subscribe(docs => {
-
       this.clips = []
 
       docs.forEach(doc => {
         this.clips.push({
           docID: doc.id,
           ...doc.data()
-      })
+        })
       })
     })
   }
@@ -48,8 +46,7 @@ export class ManageComponent implements OnInit {
   sort(event: Event) {
     const { value } = (event.target as HTMLSelectElement)
 
-    // this.router.navigateByUrl(`/manage?sort=${value}`)     -- One approach to handle Query params
-    this.router.navigate([], {                                // Another approach to handle Query params
+    this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
         sort: value
@@ -61,12 +58,13 @@ export class ManageComponent implements OnInit {
     $event.preventDefault()
 
     this.activeClip = clip
+
     this.modal.toggleModal('editClip')
   }
 
   update($event: IClip) {
     this.clips.forEach((element, index) => {
-      if(element.docID === $event.docID) {
+      if(element.docID == $event.docID) {
         this.clips[index].title = $event.title
       }
     })
@@ -78,9 +76,24 @@ export class ManageComponent implements OnInit {
     this.clipService.deleteClip(clip)
 
     this.clips.forEach((element, index) => {
-      if(element.docID === clip.docID) {
+      if(element.docID == clip.docID) {
         this.clips.splice(index, 1)
       }
     })
   }
+
+  async copyToClipboard($event: MouseEvent, docID: string | undefined) {
+    $event.preventDefault()
+
+    if(!docID) {
+      return
+    }
+
+    const url = `${location.origin}/clip/${docID}`
+
+    await navigator.clipboard.writeText(url)
+
+    alert('Link Copied!')
+  }
+
 }
